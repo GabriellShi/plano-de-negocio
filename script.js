@@ -1,4 +1,28 @@
 // script.js
+
+// Função para salvar estados dos checkboxes em localStorage
+function saveCheckboxStates() {
+    var checkboxStates = {};
+    var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(function(checkbox) {
+        checkboxStates[checkbox.id] = checkbox.checked;
+    });
+    localStorage.setItem('checkboxStates', JSON.stringify(checkboxStates));
+}
+
+// Função para carregar estados dos checkboxes de localStorage
+function loadCheckboxStates() {
+    var checkboxStates = JSON.parse(localStorage.getItem('checkboxStates'));
+    if (checkboxStates) {
+        var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(function(checkbox) {
+            checkbox.checked = checkboxStates[checkbox.id] || false;
+        });
+        updateProgress();
+    }
+}
+
+// Função para alternar a exibição de detalhes
 function toggleDetails(id) {
     var element = document.getElementById(id);
     if (element.style.display === "none" || element.style.display === "") {
@@ -8,15 +32,19 @@ function toggleDetails(id) {
     }
 }
 
+// Função para atualizar o progresso
 function updateProgress() {
     var totalItems = 12; // Total number of items
     var checkedItems = document.querySelectorAll('input[type="checkbox"]:checked').length;
     var progress = (checkedItems / totalItems) * 100;
 
-    // Update the progress chart
+    // Atualiza o gráfico de progresso
     progressChart.data.datasets[0].data[0] = progress;
     progressChart.data.datasets[0].data[1] = 100 - progress;
     progressChart.update();
+
+    // Salva os estados dos checkboxes
+    saveCheckboxStates();
 }
 
 // Configuração do gráfico de barras
@@ -100,3 +128,6 @@ var progressChart = new Chart(ctxProgress, {
         }
     }
 });
+
+// Carregar estados dos checkboxes ao carregar a página
+window.onload = loadCheckboxStates;
